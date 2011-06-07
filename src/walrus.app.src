@@ -1,0 +1,4 @@
+{application, walrus, [
+    {description, "Erlang Mustache compiler"},
+    {vsn, "0.1.0"}
+]}.
