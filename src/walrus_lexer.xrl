@@ -11,11 +11,12 @@ Rules.
 {{/  : {token,{'{{/',TokenLine}}.
 {{\^ : {token,{'{{^',TokenLine}}.
 {{{  : {token,{'{{{',TokenLine}}.
-\s*{K}\s*}} : {token,{key,TokenLine,?to_key(TokenChars,TokenLen)},"}}"}.
+\s*{K}\s*}} : {token,{key,TokenLine,key(TokenChars,TokenLen)},"}}"}.
 }}   : {token,{'}}',TokenLine}}.
 }}}  : {token,{'}}}',TokenLine}}.
 
 Erlang code.
 
--define(to_key(TokenChars, TokenLen),
-    (list_to_atom(string:strip(string:left(TokenChars, TokenLen-2))))).
+-compile({inline, key/2}).
+key(TokenChars, TokenLen) ->
+    list_to_atom(string:strip(string:left(TokenChars, TokenLen-2))).

@@ -27,4 +27,4 @@ basic_test() ->
                     {key,3,over18},
                     {'}}',3},
                     {text,3,"?"}],3},
-     Expected = walrus_lexer:string(Tmpl).
+    Expected = walrus_lexer:string(Tmpl).
