@@ -59,6 +59,12 @@ Examples
     3> Tmpl(Ctx).
     <<"Hello Devin & Jane.\n\nDrinks:\n\n\n    - Beer, 5\n\n    - Juice, 8\n">>
 
+Acknowledgments
+---------------
+Robert Virding helped me tremendously when I struggled to
+understand Leex. He's also responsible for
+`([^{}]|({[^{])|(}[^}]))+`.
+
 License
 -------
 
