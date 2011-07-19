@@ -6,6 +6,8 @@
 -define(is_falsy(V),
     (V =:= false orelse V =:= [] orelse V =:= undefined orelse V =:= null)).
 
+compile(Template) when is_binary(Template) ->
+    compile(binary_to_list(Template));
 compile(Template) ->
     {ok, Tokens, _} = walrus_lexer:string(Template),
     {ok, ParseTree} = walrus_parser:parse(Tokens),
@@ -13,6 +15,8 @@ compile(Template) ->
         render(ParseTree, Context, [])
     end.
 
+render(Template, Context) when is_binary(Template) ->
+    render(binary_to_list(Template), Context);
 render(Template, Context) ->
     {ok, Tokens, _} = walrus_lexer:string(Template),
     {ok, ParseTree} = walrus_parser:parse(Tokens),
