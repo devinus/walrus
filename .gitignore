@@ -1,3 +1,11 @@
 .eunit
 src/walrus_lexer.erl
 src/walrus_parser.erl
+/.project
+ebin
+ebin_w
+doc
+.project
+.settings
+rebar
+deps
