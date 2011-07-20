@@ -1,5 +1,4 @@
-Walrus - Mustache-like Templating
-=================================
+# Walrus - Mustache-like Templating
 
 Walrus is 50% Mustache and 50% large flippered marine mammal.
 
@@ -17,8 +16,27 @@ lexing and parsing templates every time you want to render
 them by using `compile/1`, which returns a lambda you can
 then pass a context that renders the template.
 
-Examples
---------
+## Dependencies
+
+* [mochiweb](https://github.com/mochi/mochiweb.git) for `mochinum`
+
+## Build, test and use with rebar
+
+Clone repository and run `make`
+
+    make
+    
+This automatically make fresh [rebar](https://github.com/basho/rebar.git) 
+build system, pull dependencies, compile, test and make docs.
+
+To use `walrus` with `rebar` add following in your rebar config:
+
+    {deps, [
+            {walrus, ".*", 
+             {git, "git://github.com/devinus/walrus.git", "master"}}
+           ]}. 
+
+## Examples
 
 ### Simple `render`
 
@@ -59,14 +77,13 @@ Examples
     3> Tmpl(Ctx).
     <<"Hello Devin & Jane.\n\nDrinks:\n\n\n    - Beer, 5\n\n    - Juice, 8\n">>
 
-Acknowledgments
----------------
+## Acknowledgments
+
 Robert Virding helped me tremendously when I struggled to
 understand Leex. He's also responsible for
 `([^{}]|({[^{])|(}[^}]))+`.
 
-License
--------
+## License
 
 All code released into the public domain (see `UNLICENSE`)
 except for the file `mochinum.erl`, which has it's own
