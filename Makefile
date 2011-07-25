@@ -1,15 +1,26 @@
-.PHONY: all compile test dialyze clean
+REBAR = ./rebar
+DIALYZER = dialyzer
+
+DIALYZER_WARNINGS = -Wunmatched_returns -Werror_handling \
+                    -Wrace_conditions -Wbehaviours -Wunderspecs
+
+.PHONY: all compile test clean
 
 all: compile
 
 compile:
-	@./rebar compile
+	@$(REBAR) compile
 
-test:
-	@./rebar eunit
-
-dialyze: compile
-	@./rebar dialyze
+test: compile
+	@$(REBAR) eunit
 
 clean:
-	@./rebar clean
+	@$(REBAR) clean
+
+build-plt:
+	@$(DIALYZER) --build_plt --output_plt .dialyzer_plt \
+	    --apps kernel stdlib
+
+dialyze: compile
+	@$(DIALYZER) --src src --plt .dialyzer_plt $(DIALYZER_WARNINGS) | \
+	    fgrep -vf .dialyzer-ignore-warnings

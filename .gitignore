@@ -1,3 +1,4 @@
 .eunit
+.dialyzer_plt
 src/walrus_lexer.erl
 src/walrus_parser.erl
