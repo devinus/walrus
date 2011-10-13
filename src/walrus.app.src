@@ -1,5 +1,10 @@
 {application, walrus, [
     {description, "Erlang Mustache compiler"},
     {vsn, "0.1.0"},
-    {registered, []}
+    {registered, []},
+    {applications, [
+                    kernel,
+                    stdlib
+                   ]},
+    {env, []}
 ]}.
