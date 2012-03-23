@@ -1,4 +1,6 @@
 -module(tpl_bench).
+-author("Ivan Blinkov <ivan@blinkov.ru>").
+
 -export([run/0]).
 %% Mustache.erl: https://github.com/mojombo/mustache.erl
 %% Walrus: https://github.com/devinus/walrus
