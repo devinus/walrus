@@ -5,6 +5,7 @@
 
 -define(is_falsy(V),
     (V =:= false orelse V =:= [] orelse V =:= undefined orelse V =:= null)).
+-define(DEFAULT_VALUE,"").
 
 -type value() :: list() | binary() | integer() | float() | atom().
 -type context() :: [{Key :: string(), Value :: value()}, ...].
@@ -67,7 +68,7 @@ render([], _Context, Acc) ->
 
 -spec get(Key :: atom(), Context :: context()) -> stringifiable().
 get(Key, Context) ->
-    Value = proplists:get_value(Key, Context),
+    Value = proplists:get_value(Key, Context, ?DEFAULT_VALUE),
     if
         is_function(Value) -> Value(Context);
         true -> Value
