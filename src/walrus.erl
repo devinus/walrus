@@ -75,12 +75,14 @@ get(Key, Context) ->
 
 -spec stringify(Value :: stringifiable(), Context :: context(), Escape :: boolean())
     -> iolist().
+stringify(Value, _Context, false) when is_binary(Value) ->
+    binary_to_list(Value);
+stringify(Value, _Context, true) when is_binary(Value) ->
+    escape(binary_to_list(Value));
 stringify(Value, _Context, false) when is_list(Value) ->
     Value;
 stringify(Value, _Context, true) when is_list(Value) ->
     escape(Value);
-stringify(Value, _Context, true) when is_binary(Value) ->
-    escape(binary_to_list(Value));
 stringify(Value, _Context, _Escape) when is_integer(Value) ->
     integer_to_list(Value);
 stringify(Value, _Context, _Escape) when is_float(Value) ->
