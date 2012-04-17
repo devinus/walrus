@@ -48,7 +48,7 @@ render([{block, Key, SubParseTree} | ParseTree], Context, Acc) ->
         Val when ?is_falsy(Val) ->
             render(ParseTree, Context, Acc);
         Val when is_list(Val) ->
-            Tmpl = [render(SubParseTree, Ctx, []) || Ctx <- Val],
+            Tmpl = [render(SubParseTree, Ctx ++ Context, []) || Ctx <- Val],
             render(ParseTree, Context, [Tmpl | Acc]);
         _ ->
             Tmpl = render(SubParseTree, Context, []),
