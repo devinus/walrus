@@ -19,7 +19,8 @@ compile(Template) when is_list(Template) ->
     {ok, Tokens, _} = walrus_lexer:string(Template),
     {ok, ParseTree} = walrus_parser:parse(Tokens),
     fun (Context, PartialsContext) ->
-        render(ParseTree, Context, PartialsContext, [])
+        IOList = render_iolist(ParseTree, Context, PartialsContext, []),
+        iolist_to_binary(IOList)
     end.
 
 -spec render(Template :: list() | binary(), Context :: context())
@@ -34,41 +35,54 @@ render(Template, Context, PartialsContext) when is_binary(Template) ->
 render(Template, Context, PartialsContext) when is_list(Template) ->
     {ok, Tokens, _} = walrus_lexer:string(Template),
     {ok, ParseTree} = walrus_parser:parse(Tokens),
-    render(ParseTree, Context, PartialsContext, []).
+    IOList = render_iolist(ParseTree, Context, PartialsContext, []),
+    iolist_to_binary(IOList).
 
--spec render(ParseTree :: list(), Context :: context(), PartialsContext :: context(), Acc :: list())
+-spec render_iolist(ParseTree :: list(), Context :: context(), PartialsContext :: context(), Acc :: list())
     -> binary().
-render([{text, Text} | ParseTree], Context, PartialsContext, Acc) ->
-    render(ParseTree, Context, PartialsContext, [Text | Acc]);
-render([{var, Key} | ParseTree], Context, PartialsContext, Acc) ->
+render_iolist([{text, Text} | ParseTree], Context, PartialsContext, Acc) ->
+    render_iolist(ParseTree, Context, PartialsContext, [Text | Acc]);
+render_iolist([{var, Key} | ParseTree], Context, PartialsContext, Acc) ->
     Value = get(Key, Context),
-    render(ParseTree, Context, PartialsContext, [stringify(Value, Context, true) | Acc]);
-render([{var_unescaped, Key} | ParseTree], Context, PartialsContext, Acc) ->
+    render_iolist(ParseTree, Context, PartialsContext, [stringify(Value, Context, true) | Acc]);
+render_iolist([{var_unescaped, Key} | ParseTree], Context, PartialsContext, Acc) ->
     Value = get(Key, Context),
-    render(ParseTree, Context, PartialsContext, [stringify(Value, Context, false) | Acc]);
-render([{block, Key, SubParseTree} | ParseTree], Context, PartialsContext, Acc) ->
+    render_iolist(ParseTree, Context, PartialsContext, [stringify(Value, Context, false) | Acc]);
+render_iolist([{block, Key, SubParseTree} | ParseTree], Context, PartialsContext, Acc) ->
     Value = get(Key, Context),
     case Value of
         Val when ?is_falsy(Val) ->
-            render(ParseTree, Context, PartialsContext, Acc);
+            render_iolist(ParseTree, Context, PartialsContext, Acc);
         Val when is_list(Val) ->
-            Tmpl = [render(SubParseTree, Ctx, PartialsContext, []) || Ctx <- Val],
-            render(ParseTree, Context, PartialsContext, [Tmpl | Acc]);
+            Tmpl = [render_iolist(SubParseTree, Ctx, PartialsContext, []) || Ctx <- Val],
+            render_iolist(ParseTree, Context, PartialsContext, [Tmpl | Acc]);
         _ ->
-            Tmpl = render(SubParseTree, Context, PartialsContext, []),
-            render(ParseTree, Context, PartialsContext, [Tmpl | Acc])
+            Tmpl = render_iolist(SubParseTree, Context, PartialsContext, []),
+            render_iolist(ParseTree, Context, PartialsContext, [Tmpl | Acc])
     end;
-render([{inverse, Key, SubParseTree} | ParseTree], Context, PartialsContext, Acc) ->
+render_iolist([{inverse, Key, SubParseTree} | ParseTree], Context, PartialsContext, Acc) ->
     Value = get(Key, Context),
     case Value of
         Val when ?is_falsy(Val) ->
-            Tmpl = render(SubParseTree, Context, PartialsContext, []),
-            render(ParseTree, Context, PartialsContext, [Tmpl | Acc]);
+            Tmpl = render_iolist(SubParseTree, Context, PartialsContext, []),
+            render_iolist(ParseTree, Context, PartialsContext, [Tmpl | Acc]);
         _ ->
-            render(ParseTree, Context, PartialsContext, Acc)
+            render_iolist(ParseTree, Context, PartialsContext, Acc)
     end;
-render([], _Context, _PartialsContext, Acc) ->
-    iolist_to_binary(lists:reverse(Acc)).
+render_iolist([{partial, Key} | ParseTree], Context, PartialsContext, Acc) ->
+    Value = get(Key, PartialsContext),
+    case Value of
+        Template when is_list(Template); is_binary(Template) ->
+            {ok, Tokens, _} = walrus_lexer:string(Template),
+            {ok, PartialParseTree} = walrus_parser:parse(Tokens),
+            IOList = render_iolist(PartialParseTree, Context, PartialsContext, []),
+            render_iolist(ParseTree, Context, PartialsContext, [ lists:reverse(IOList) | Acc]);
+        Fun when is_function(Fun, 2) ->
+            Output = Fun(Context, PartialsContext),
+            render_iolist(ParseTree, Context, PartialsContext, [ Output | Acc])
+    end;
+render_iolist([], _Context, _PartialsContext, Acc) ->
+    lists:reverse(Acc).
 
 -spec get(Key :: atom(), Context :: context()) -> stringifiable().
 get(Key, Context) ->
