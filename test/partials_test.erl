@@ -22,24 +22,21 @@ basic_test() ->
 
 nested_test() ->
     MainTemplate = "My name is {{name}}\n"
-                   "I plan to travel into following places:\n\n"
-                   "{{#places}}\n"
-                   "  {{> place_item }}\n"
-                   "{{/places}}",
+                   "I plan to travel into following places:\n"
+                   
+                   "{{#places}}\n  {{> place_item }}\n{{/places}}\n",
     
-    PlaceItemTemplate = "{{name}} ({{country}}):\n{{> place_description }}",
-    PlaceDescTemplate = "  {{description}}",
+    PlaceItemTemplate = "{{name}} ({{country}}): {{> place_description }}",
+    PlaceDescTemplate = "{{description}}",
     Context = [{name, "Vladimir"},
                {places, [
                  [{name, "San Jose"}, {country, "USA"}, {description, "Very interesting place"}],
                  [{name, "Kiev"}, {country, "Ukraine"}, {description, "Great place"}]
     ]}],
     PartialsContext = [{place_item, PlaceItemTemplate}, {place_description, PlaceDescTemplate}],
-    Expected = "My name is Vladimir\n"
-               "I plan to travel into following places:\n\n"
-               "San Jose (USA):"
-               "  Very interesting place"
-               "Kiev (Ukraine):"
-               "  Great place place",
+    Expected = <<"My name is Vladimir\n"
+                 "I plan to travel into following places:\n\n"
+                 "  San Jose (USA): Very interesting place\n\n"
+                 "  Kiev (Ukraine): Great place\n\n">>,
     Expected = walrus:render(MainTemplate, Context, PartialsContext).
     

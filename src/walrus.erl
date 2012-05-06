@@ -76,7 +76,7 @@ render_iolist([{partial, Key} | ParseTree], Context, PartialsContext, Acc) ->
             {ok, Tokens, _} = walrus_lexer:string(Template),
             {ok, PartialParseTree} = walrus_parser:parse(Tokens),
             IOList = render_iolist(PartialParseTree, Context, PartialsContext, []),
-            render_iolist(ParseTree, Context, PartialsContext, [ lists:reverse(IOList) | Acc]);
+            render_iolist(ParseTree, Context, PartialsContext, [ IOList | Acc]);
         Fun when is_function(Fun, 2) ->
             Output = Fun(Context, PartialsContext),
             render_iolist(ParseTree, Context, PartialsContext, [ Output | Acc])
