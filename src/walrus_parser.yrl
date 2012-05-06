@@ -1,6 +1,6 @@
 Nonterminals template token var block inverse.
 
-Terminals text key '{{' '{{{' '{{#' '{{/' '{{^' '}}' '}}}'.
+Terminals text key '{{' '{{{' '{{&' '{{#' '{{/' '{{^' '}}' '}}}'.
 
 Rootsymbol template.
 
@@ -14,6 +14,7 @@ token -> inverse : '$1'.
 
 var -> '{{' key '}}' : {var, ?value('$2')}.
 var -> '{{{' key '}}}' : {var_unescaped, ?value('$2')}.
+var -> '{{&' key '}}' : {var_unescaped, ?value('$2')}.
 
 block -> '{{#' key '}}' template '{{/' key '}}'
     : section(block, '$2', '$6', '$4').
