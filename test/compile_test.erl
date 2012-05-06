@@ -22,4 +22,4 @@ basic_test() ->
                  "    - Beer, 5\n\n"
                  "    - Juice, 8\n">>,
 
-    Expected = Renderer(Context).
+    Expected = Renderer(Context, []).
